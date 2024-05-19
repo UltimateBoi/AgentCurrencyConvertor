@@ -1,0 +1,11 @@
+{
+    "manifest_version": 3,
+    "name": "Agent Currency Convertor",
+    "description": "Converts currencies for Chinese shopping agnets",
+    "version": "1.0",
+    "author": "coder_ultimate (u/UltimateBoiReal)",
+    "content_scripts": {
+        "matches": ["*://*.superbuy.com/*"],
+        "js": ["content.js"]
+    }
+}
