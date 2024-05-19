@@ -4,8 +4,23 @@
     "description": "Converts currencies for Chinese shopping agnets",
     "version": "1.0",
     "author": "coder_ultimate (u/UltimateBoiReal)",
-    "content_scripts": {
-        "matches": ["*://*.superbuy.com/*"],
-        "js": ["content.js"]
-    }
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "webRequest"
+      ],
+      "host_permissions": [
+        "*://*.superbuy.com/",
+        "https://api.sandbox.transferwise.tech/"
+      ],
+      "action": {},
+      "background": {
+        "service_worker": "background.js"
+      },
+    "content_scripts": [
+        {
+            "matches": ["*://*.superbuy.com/*"],
+            "js": ["content.js"]
+        }
+    ]
 }
