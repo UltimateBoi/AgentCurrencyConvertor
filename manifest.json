@@ -1,26 +1,32 @@
 {
-    "manifest_version": 3,
-    "name": "Agent Currency Convertor",
-    "description": "Converts currencies for Chinese shopping agnets",
-    "version": "1.0",
-    "author": "coder_ultimate (u/UltimateBoiReal)",
-    "permissions": [
-        "activeTab",
-        "scripting",
-        "webRequest"
-      ],
-      "host_permissions": [
-        "*://*.superbuy.com/",
-        "https://api.sandbox.transferwise.tech/"
-      ],
-      "action": {},
-      "background": {
-        "service_worker": "background.js"
-      },
-    "content_scripts": [
-        {
-            "matches": ["*://*.superbuy.com/*"],
-            "js": ["content.js"]
-        }
-    ]
+  "manifest_version": 3,
+  "name": "Agent Currency Convertor",
+  "description": "Converts currencies for Chinese shopping agents\nCurrent support agents are as following:\n- Superbuy\n- Allchinabuy\n\nThis extension is not affiliated with any of the agents mentioned above.",
+  "version": "1.1",
+  "author": "coder_ultimate (u/UltimateBoiReal)",
+  "permissions": [
+      "activeTab",
+      "scripting",
+      "webRequest"
+  ],
+  "host_permissions": [
+      "*://*.superbuy.com/",
+      "*://*.allchinabuy.com/",
+      "*://*.cssbuy.com/",
+      "https://api.sandbox.transferwise.tech/"
+  ],
+  "action": {},
+  "background": {
+      "service_worker": "background.js"
+  },
+  "content_scripts": [
+      {
+          "matches": [
+              "*://*.superbuy.com/*",
+              "*://*.allchinabuy.com/*",
+              "*://*.cssbuy.com/*"
+          ],
+          "js": ["content.js"]
+      }
+  ]
 }
