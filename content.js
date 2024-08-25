@@ -2,7 +2,7 @@ async function waitForSelectorWithText(selector) {
     return new Promise((resolve) => {
         const poller = () => {
             const element = document.querySelector(selector);
-            if (element && element.textContent.trim()) {
+            if (element && element.tagName === 'P' && element.querySelector('span') && element.querySelector('span').textContent.trim()) {
                 console.log('Found', selector);
                 resolve(element);
             } else {
@@ -29,12 +29,14 @@ async function fetchCurrency() {
     });
 }
 
-async function convertCurrency(observer) {
+async function convertCurrency(observer, goodsTxtSelector) {
     console.log('Starting currency conversion...');
-    const goodsTxtElement = await waitForSelectorWithText('.goods-txt');
+    const goodsTxtElement = await waitForSelectorWithText(goodsTxtSelector);
     console.log('goodsTxtElement:', goodsTxtElement);
 
-    const amountCNY = parseFloat(goodsTxtElement.textContent.trim());
+    const spanElement = goodsTxtElement.querySelector('span');
+    const amountCNYText = spanElement.textContent.match(/CNY ￥(\d+(\.\d+)?)/);
+    const amountCNY = amountCNYText ? parseFloat(amountCNYText[1]) : NaN;
     console.log('amountCNY:', amountCNY);
 
     if (!isNaN(amountCNY)) {
@@ -45,7 +47,7 @@ async function convertCurrency(observer) {
 
             // Temporarily disconnect the observer to prevent infinite loop
             observer.disconnect();
-            goodsTxtElement.textContent = amountGBP.toFixed(2);
+            spanElement.textContent = `CNY ￥${amountCNY.toFixed(2)} ≈£${amountGBP.toFixed(2)}`;
             observer.observe(goodsTxtElement, { childList: true, subtree: true, characterData: true });
 
             const goodsRmbElement = document.querySelector('.goods-rmb');
@@ -65,23 +67,40 @@ async function convertCurrency(observer) {
     'use strict';
 
     console.log('Initializing currency conversion script...');
-    const goodsTxtElement = await waitForSelectorWithText('.goods-txt');
+
+    // Get the current site's hostname
+    const hostname = window.location.hostname;
+
+    console.log('hostname:', hostname);
+
+    // Determine the selector based on the hostname
+    let goodsTxtSelector;
+    if (hostname === 'www.superbuy.com' || hostname === 'www.allchinabuy.com') {
+        goodsTxtSelector = '.goods-txt';
+    } else if (hostname === 'www.cssbuy.com') {
+        goodsTxtSelector = '.price';
+    } else {
+        console.error('Unsupported site:', hostname);
+        return;
+    }
+
+    const goodsTxtElement = await waitForSelectorWithText(goodsTxtSelector);
 
     if (goodsTxtElement) {
-        console.log('Setting up MutationObserver on .goods-txt');
+        console.log(`Setting up MutationObserver on ${goodsTxtSelector}`);
         const observer = new MutationObserver((mutationsList) => {
-            console.log('.goods-txt content changed, re-running conversion...');
+            console.log(`${goodsTxtSelector} content changed, re-running conversion...`);
             mutationsList.forEach((mutation) => {
                 console.log('Mutation detected:', mutation);
             });
-            convertCurrency(observer);
+            convertCurrency(observer, goodsTxtSelector);
         });
 
         observer.observe(goodsTxtElement, { childList: true, subtree: true, characterData: true });
 
         // Initial conversion
-        await convertCurrency(observer);
+        await convertCurrency(observer, goodsTxtSelector);
     } else {
-        console.error('.goods-txt element not found');
+        console.error(`${goodsTxtSelector} element not found`);
     }
 })();
