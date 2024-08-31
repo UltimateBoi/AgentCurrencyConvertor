@@ -27,4 +27,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     const data = await response.json();
     return data.rate;
-  }
+  } // TODO: not sure if needed anymore??
